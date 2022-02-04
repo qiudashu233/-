@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>用户登陆</title>
+
+
+    <!-- bootstrap -->
+    <link rel="stylesheet" type="text/css" th:href="@{/bootstrap/css/bootstrap.min.css}"/>
+    <!-- 自定义登录css -->
+    <link rel="stylesheet" type="text/css" th:href="@{/css/signin.css}"/>
+
+</head>
+
+<body class="text-center">
+<form class="form-signin" id="loginForm" name="loginForm">
+    <h1 class="h3 mb-3 font-weight-normal" style="color: #1f8dda">账号登录</h1>
+    <p id="msg" style="color: #ff0000;"></p>
+    <input type="text" name="sno" id="sno" class="form-control" placeholder="请输入账号" style="margin-top: 30px;">
+    <input type="password" name="password" id="password" class="form-control" placeholder="请输入密码"
+           style="margin-top: 30px;">
+    <label >选择列表</label>
+    <select class="form-control" id="select">
+        <option value="stu">学生</option>
+        <option value="tea">老师</option>
+    </select>
+    <button class="btn btn-lg btn-primary btn-block" id="login" type="submit" onclick="Login()"
+            style="margin-top: 30px;margin-bottom: 30px;">登录
+    </button>
+
+</form>
+
+
+<!-- 页面结束 -->
+<!-- javascript begin -->
+
+<!-- jquery -->
+<script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
+<!-- bootstrap -->
+<script type="text/javascript" th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
+<!-- jquery-validator -->
+<script type="text/javascript" th:src="@{/jquery-validation/jquery.validate.min.js}"></script>
+<script type="text/javascript" th:src="@{/jquery-validation/localization/messages_zh.min.js}"></script>
+<!-- md5.js -->
+<script type="text/javascript" th:src="@{/js/md5.min.js}"></script>
+<!-- layer.js 弹窗 -->
+<script type="text/javascript" th:src="@{/layer/layer.js}"></script>
+<!-- common.js -->
+<script type="text/javascript" th:src="@{/js/common.js}"></script>
+<!-- 自定义js -->
+<script>
+
+
+    function Login(){
+        let type = $('#select').val();
+        alert("/do/loginby"+type);
+        $.ajax({
+            url: "/do/loginby"+type,
+            type: "POST",
+            data: {
+                sno: $("#sno").val(),
+                password: $("#password").val()
+            },
+            // contentType:"application/json",
+            success: function (data) {
+                if (data === "success") {
+                    alert("登陆成功！");
+                    window.location.href = "/index";
+                } else {
+                    layer.closeAll();
+                    $("#msg").text(data.msg);
+                    updateVerifyCode()
+                }
+            },
+            error: function () {
+                layer.closeAll();
+                $("#msg").text("服务器异常，请稍后再试...");
+                $("#yzm").val('');
+            }
+        });
+    }
+
+
+
+</script>
+
+</body>
+
+</html>

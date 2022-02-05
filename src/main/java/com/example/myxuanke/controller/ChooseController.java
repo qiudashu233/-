@@ -31,12 +31,23 @@ public class ChooseController {
         return "choose";
     }
 
+    @GetMapping("/mohu")
+    public String getClassByMohuEntityList(Model model, @RequestParam(value = "pageNum", defaultValue = "0")Integer pageNum,
+                                           @RequestParam(value = "size", defaultValue = "6") Integer size) {
+        ListDTO<ClassdataEntity> listDTO = chooseService.getClassListPage(pageNum, size);
+        model.addAttribute("planDto", listDTO);
+        return "mohu";
+    }
+
     @GetMapping("/listbycname")
     public String getClassByCnameEntityList(Model model, @RequestParam(value = "pageNum", defaultValue = "0")Integer pageNum,
                                      @RequestParam(value = "size", defaultValue = "6") Integer size,@RequestParam(value = "cname", defaultValue = "")String cname) {
 
         ListDTO<ClassdataEntity> listDTO = chooseService.getNeedClassListPageByCname(pageNum, size,cname);
         model.addAttribute("planDto", listDTO);
+        model.addAttribute("type","cname");
+        model.addAttribute("data",cname);
+        LOGGER.info("cname模糊查询返回成功");
         return "mohu";
     }
 
@@ -44,8 +55,11 @@ public class ChooseController {
     public String getClassByCidEntityList(Model model, @RequestParam(value = "pageNum", defaultValue = "0")Integer pageNum,
                                             @RequestParam(value = "size", defaultValue = "6") Integer size,@RequestParam(value = "cid", defaultValue = "")String cid) {
 
-        ListDTO<ClassdataEntity> listDTO = chooseService.getNeedClassListPageByCname(pageNum, size,cid);
+        ListDTO<ClassdataEntity> listDTO = chooseService.getNeedClassListPageByCid(pageNum, size,cid);
         model.addAttribute("planDto", listDTO);
+        model.addAttribute("type","cid");
+        model.addAttribute("data",cid);
+        LOGGER.info("cid模糊查询返回成功");
         return "mohu";
     }
 
@@ -53,8 +67,11 @@ public class ChooseController {
     public String getClassByTeanameEntityList(Model model, @RequestParam(value = "pageNum", defaultValue = "0")Integer pageNum,
                                           @RequestParam(value = "size", defaultValue = "6") Integer size,@RequestParam(value = "teaname", defaultValue = "")String teaname) {
 
-        ListDTO<ClassdataEntity> listDTO = chooseService.getNeedClassListPageByCname(pageNum, size,teaname);
+        ListDTO<ClassdataEntity> listDTO = chooseService.getNeedClassListPageByTeaname(pageNum, size,teaname);
         model.addAttribute("planDto", listDTO);
+        model.addAttribute("type","teaname");
+        model.addAttribute("data",teaname);
+        LOGGER.info("teaname模糊查询返回成功");
         return "mohu";
     }
 

@@ -39,14 +39,11 @@
                                     <span class="input-group-addon" >输入内容</span>
                                     <input type="text" class="form-control" placeholder=" " id="input">
                                 </div>
+                                    <button class="submit" id="chaxun" onclick="chaxun()"
+                                    >查询</button>
                                 <div class="pull-right">
                                     <button class="btn btn-label btn-w-lg btn-primary" id="confirm">
                                         <label><i class="mdi mdi-checkbox-marked-circle-outline"></i></label> 确认选课
-                                    </button>
-                                </div>
-                                <div class="pull-right">
-                                    <button class="btn btn-label btn-w-lg btn-primary" id="chaxun" onclick="chaxun()">
-                                        <label><i class="mdi mdi-checkbox-marked-circle-outline"></i></label> 查询
                                     </button>
                                 </div>
                             </div>
@@ -89,13 +86,13 @@
                                 </table>
 
                                 <div>
-                                    <ul class="pagination pull-right" data="" data1="" id="leaf">
-                                        <li><a th:href="@{'/choose/listby'+data1+'?pageNum=0&'+data1+'=' + data}">首页</a></li>
+                                    <ul class="pagination pull-right" id="leaf" th:data-type="${type}" th:data-num="${data}">
+                                        <li><a th:href="@{'/choose/listby'+${type}+'?'+${type}+'='+${data}+'&pageNum=0'}">首页</a></li>
                                         <li>
-                                            <a th:if="${planDto.number != 0}" th:href="@{'/choose/listby'+data1+'?'+data1+'='+data+'&pageNum=' + ${planDto.number - 1}}" th:text="上一页"></a>
+                                            <a th:if="${planDto.number != 0}" th:href="@{'/choose/listby'+${type}+'?'+${type}+'='+${data}+'&pageNum=' + ${planDto.number - 1}}" th:text="上一页" ></a>
                                         </li>
                                         <li>
-                                            <a th:if="${planDto.number == 0}" th:href="@{'/choose/listby'+data1+'?'+data1+'='+data+'pageNum=0'}" th:text="上一页"></a>
+                                            <a th:if="${planDto.number == 0}" th:href="@{'/choose/listby'+${type}+'?'+${type}+'='+${data}+'&pageNum=0'}" th:text="上一页"></a>
                                         </li>
 
                                         <!--<li th:each="pageNum:${#numbers.sequence(0, Plan.getTotalPages() - 1)}">
@@ -105,12 +102,12 @@
                                         <li><a class="btn btn-default btn-lg active" href="#" >1</a></li>-->
 
                                         <li>
-                                            <a th:if="${planDto.number != (planDto.totalPages - 1)}" th:href="@{'/choose/listby'+data1+'?'+data1+'='+data+'pageNum=' + ${planDto.number + 1}}" th:text="下一页"></a>
+                                            <a th:if="${planDto.number != (planDto.totalPages - 1)}" th:href="@{'/choose/listby'+${type}+'?'+${type}+'='+${data}+'&pageNum=' + ${planDto.number + 1}}" th:text="下一页" ></a>
                                         </li>
                                         <li>
-                                            <a th:if="${planDto.number == (planDto.totalPages - 1)}" th:href="@{'/choose/listby'+data1+'?'+data1+'='+data+'pageNum=' + ${planDto.totalPages - 1}}" th:text="下一页"></a>
+                                            <a th:if="${planDto.number == (planDto.totalPages - 1)}" th:href="@{'/choose/listby'+${type}+'?'+${type}+'='+${data}+'&pageNum=' + ${planDto.totalPages - 1}}" th:text="下一页" ></a>
                                         </li>
-                                        <li><a th:href="@{'/choose/listby'+data1+'?'+data1+'='+data+'pageNum='+ ${planDto.totalPages==0 ? 0: planDto.totalPages - 1 } }" >尾页</a></li>
+                                        <li><a th:href="@{'/choose/listby'+${type}+'?'+${type}+'='+${data}+'&pageNum='+ ${planDto.totalPages==0 ? 0: planDto.totalPages - 1 } }" >尾页</a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -135,59 +132,39 @@
 <div th:replace="common/common::common_js(~{::script})">
     <script>
 
-        function getPno() {
-            var pno = "";
-            $.each($('input:checkbox:checked'), function () {
-                pno = $(this).val();
-                return false;
-            });
-            return pno;
-        }
-
         function chaxun(){
             let data = $('#input').val();
             let type = $('#select').val()
-            alert("cha xun kai shi");
-            $('#leaf').attr({"data":data,
-                "data1":type
-            });
-            $.ajax({
-                url: "/choose/listby"+type+"?cname="+data ,
-                type: "GET",
-                async: false,
-                success: function (dto) {
-                    if(dto.success){
-                        alert(dto.data);
-                    }else{
-                        alert(dto.errMsg);
-                    }
-                }
-            })
-
+            alert("/choose/listby"+type+"?"+type+"="+data+"&pageNum=0");
+            alert('查询成功');
+            window.location.href = "/choose/listby"+type+"?"+type+"="+data+"&pageNum=0";
         }
 
-
-
-        $('#confirm').click(function () {
-            let pno = getPno();
+        $('#confirm').click(function(){
             if (confirm("是否确认选择！")) {
-                $.ajax({
-                    url: "/choose/"+ pno +"/confirm",
-                    type: "POST",
-                    async: false,
-                    success: function (dto) {
-                        if(dto.success){
-                            alert(dto.data);
-                        }else{
-                            alert(dto.errMsg);
-                        }
-                    }
+                let flag = 1;
+                $.each($('input:checkbox:checked'), function (){
+                    let pno = $(this).val();
+                        $.ajax({
+                            url: "/choose/"+ pno +"/confirm",
+                            type: "POST",
+                            async: false,
+                            success: function (dto) {
+                                if(dto.success){
+                                    if(flag == 1){
+                                        alert(dto.data);
+                                        flag = 0;
+                                    }
+                                }else{
+                                    alert(dto.errMsg);
+                                }
+                            }
+                        })
+
                 })
-            }else {
-                //刷新，得到最新的课程余量
-                // location.reload();
             }
-        });
+        })
+
 
     </script>
 </div>

@@ -96,7 +96,7 @@
                                         <li>
                                             <a th:if="${planDto.number == (planDto.totalPages - 1)}" th:href="@{'/choose/list?pageNum=' + ${planDto.totalPages - 1}}" th:text="下一页"></a>
                                         </li>
-                                        <li><a th:href="@{'/choose/elective/list?pageNum='+ ${planDto.totalPages==0 ? 0: planDto.totalPages - 1 } }" >尾页</a></li>
+                                        <li><a th:href="@{'/choose/list?pageNum='+ ${planDto.totalPages==0 ? 0: planDto.totalPages - 1 } }" >尾页</a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -121,35 +121,30 @@
 <div th:replace="common/common::common_js(~{::script})">
     <script>
 
-        function getPno() {
-            var pno = "";
-            $.each($('input:checkbox:checked'), function () {
-                pno = $(this).val();
-                return false;
-            });
-            return pno;
-        }
-
-        $('#confirm').click(function () {
-            let pno = getPno();
+        $('#confirm').click(function(){
             if (confirm("是否确认选择！")) {
-                $.ajax({
-                    url: "/choose/"+ pno +"/confirm",
-                    type: "POST",
-                    async: false,
-                    success: function (dto) {
-                        if(dto.success){
-                            alert(dto.data);
-                        }else{
-                            alert(dto.errMsg);
-                        }
-                    }
-                    })
-            }else {
-                //刷新，得到最新的课程余量
-                // location.reload();
+                let flag=1;
+                $.each($('input:checkbox:checked'), function (){
+                    let pno = $(this).val();
+                        $.ajax({
+                            url: "/choose/"+ pno +"/confirm",
+                            type: "POST",
+                            async: false,
+                            success: function (dto) {
+                                if(dto.success){
+                                    if (flag==1){
+                                        alert(dto.data);
+                                        flag = 0;
+                                    }
+                                }else{
+                                    alert(dto.errMsg);
+                                }
+                            }
+                        })
+                })
             }
-        });
+        })
+
     </script>
 </div>
 

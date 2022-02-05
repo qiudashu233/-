@@ -22,5 +22,5 @@ public interface XuankedataRepository extends JpaRepository<XuankedataEntity, In
     List<XuankedataEntity> findXuankedataEntitiesByCid(String cid);
 
     //pno sno chaxun
-    XuankedataEntity findXuankedataEntityByPnoAndSno(String pno,String sno);
+    XuankedataEntity findXuankedataEntityByPnoAndSno(Integer pno,String sno);
 }

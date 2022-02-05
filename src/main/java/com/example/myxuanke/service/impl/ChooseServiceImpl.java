@@ -86,7 +86,6 @@ public class ChooseServiceImpl implements ChooseService, InitializingBean {
 
         ListDTO<ClassdataEntity> listDTO = (ListDTO<ClassdataEntity>)redisService.getFromHash("forClass_Cname", String.valueOf(pageNum));
         if(listDTO != null) return listDTO;
-
         Pageable pageable = PageRequest.of(pageNum, size, Sort.by("pno"));
 
         //复杂条件查询,只查询余量不为0的课程
@@ -96,14 +95,13 @@ public class ChooseServiceImpl implements ChooseService, InitializingBean {
             //余量需要大于0
             predicates.add(builder.greaterThan(root.get("num"), 0));
 
-            predicates.add(builder.like(root.get("cname"), cname));
+            predicates.add(builder.like(root.get("cname"), "%"+cname+"%"));
 
             return builder.and(predicates.toArray(new Predicate[0]));
 
         }, pageable);
 
         ListDTO<ClassdataEntity> planDto = new ListDTO<>(page.stream().collect(Collectors.toList()), page.getNumber(), size, page.getTotalPages());
-
         //结果变动快，缓存一分钟，减少数据库压力，缺陷是课程余量显示会存在延迟
         redisService.setToHash("forClass_Cname", String.valueOf(pageNum), planDto, 1, TimeUnit.MINUTES);
         return planDto;
@@ -124,7 +122,7 @@ public class ChooseServiceImpl implements ChooseService, InitializingBean {
             //余量需要大于0
             predicates.add(builder.greaterThan(root.get("num"), 0));
 
-            predicates.add(builder.like(root.get("cid"), cid));
+            predicates.add(builder.like(root.get("cid"), "%"+cid+"%"));
 
             return builder.and(predicates.toArray(new Predicate[0]));
 
@@ -152,7 +150,7 @@ public class ChooseServiceImpl implements ChooseService, InitializingBean {
             //余量需要大于0
             predicates.add(builder.greaterThan(root.get("num"), 0));
 
-            predicates.add(builder.like(root.get("teaname"), tname));
+            predicates.add(builder.like(root.get("teaname"), "%"+tname+"%"));
 
             return builder.and(predicates.toArray(new Predicate[0]));
 
@@ -174,7 +172,7 @@ public class ChooseServiceImpl implements ChooseService, InitializingBean {
             if (flag == null) return false;
             return flag;
         });
-        LOGGER.info("jian cha wan ben di");
+
         //无余量直接返回
         if (over) {
 //            LOGGER.info("通过本地标记判断已无余量");
@@ -183,14 +181,15 @@ public class ChooseServiceImpl implements ChooseService, InitializingBean {
 
         //2.判断是否重选
         String sno = StudentIDUtils.getStudentIDFromMap();
+
         // 先读取此节课的选课结果
         // 优先从redis中加载
         XuankedataEntity entity = resultService.findChooseClassByPnoAndSno(pno, sno);
+
         if (entity != null) {
             throw new GlobalException(CodeMsg.CHOOSE_REPEAT);
         }
 
-        LOGGER.info("jian cha wan chong xuan");
         //3.库存预减
         //如果key不存在，会写入并返回-1,需先判断
         if(!redisService.hasKey("forClassCount")){
@@ -212,7 +211,7 @@ public class ChooseServiceImpl implements ChooseService, InitializingBean {
         }
 
         //4.返回结果
-        LOGGER.info("xuan ke");
+
         executeChoose(sno,pno);
         return new ResultDTO<>(CodeMsg.CHOOSE_END.getMsg());
     }

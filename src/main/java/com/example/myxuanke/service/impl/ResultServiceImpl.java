@@ -122,7 +122,7 @@ public class ResultServiceImpl implements ResultService {
         resultRepository.delete(resultEntity);
 
         //授课计划余量加一
-        Integer a = planRepository.increaseNumByPno(Integer.valueOf(resultEntity.getPno()));
+        Integer a = planRepository.increaseNumByPno(resultEntity.getPno());
         if(a == 0){
             throw new GlobalException(CodeMsg.PLAN_NUM_ERROR);
         }
@@ -147,8 +147,7 @@ public class ResultServiceImpl implements ResultService {
         //从redis中得到是否有对应选课记录
         entity = (XuankedataEntity) redisService.getFromHash("forResult" + "-" + sno, String.valueOf(pno));
         if( entity!=null ) return entity;
-
-        entity = resultRepository.findXuankedataEntityByPnoAndSno(String.valueOf(pno), String.valueOf(sno));
+        entity = resultRepository.findXuankedataEntityByPnoAndSno(pno, sno);
         if(entity != null){
             redisService.setToHash("forResult" + "-" + sno, String.valueOf(pno), entity, 1, TimeUnit.DAYS);
         }

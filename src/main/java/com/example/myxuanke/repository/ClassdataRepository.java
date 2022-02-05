@@ -8,17 +8,20 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Repository
 public interface ClassdataRepository extends JpaRepository<ClassdataEntity, Integer>, JpaSpecificationExecutor<ClassdataEntity>{
     //选课
+    @Transactional
     @Modifying
     @Query("update ClassdataEntity p set p.num = p.num-1 where p.pno =?1 and p.num > 0")
     Integer reduceNumByPno(Integer pno);
 
     //退课
+    @Transactional
     @Modifying
     @Query("update ClassdataEntity p set p.num = p.num+1 where p.pno =?1 and p.num < p.capacity")
     Integer increaseNumByPno(Integer pno);

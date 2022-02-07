@@ -25,7 +25,6 @@ public class TeacherServiceImpl implements TeacherService {
     private RedisService redisService;
 
     @Override
-    //@Cacheable(cacheNames = "forStudent", key = "#sno", cacheManager = "publicInfo")    //todo 为啥缓存未生效
     public TeadataEntity findTeacherById(String tno) {
 
         TeadataEntity studentEntity = (TeadataEntity) redisService.get("forTeacher::", String.valueOf(tno));
@@ -38,7 +37,6 @@ public class TeacherServiceImpl implements TeacherService {
         Preconditions.checkArgument(optional.isPresent(), "用户不存在！");
         studentEntity = optional.get();
 
-        //学生数据不变动，经常查询，缓存一天
         redisService.set("forTeacher::", String.valueOf(tno), studentEntity, 1, TimeUnit.DAYS);
         LOGGER.info("从数据库加载到teacher信息，并存入redis中");
 

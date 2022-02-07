@@ -75,6 +75,32 @@ public class ResultServiceImpl implements ResultService {
     }
 
     @Override
+    public ListDTO<XuankedataEntity> getChooseClassListPageByTno(Integer pageNum, Integer size, String tno) {
+
+        ListDTO<XuankedataEntity> listDTO = (ListDTO<XuankedataEntity>) redisService.getFromHash("forResultList::" + tno, tno + "-" + pageNum);
+
+        if (listDTO != null) {
+//            LOGGER.info("从redis中加载选课结果");
+            return listDTO;
+        }
+
+        //分页查询
+        Pageable pageable = PageRequest.of(pageNum, size);
+
+        //jpa查询
+        List<XuankedataEntity> list = resultRepository.findXuankedataEntitiesByTno(tno);
+        Integer total = Integer.valueOf(list.size()/size);
+        //jpa复杂查询
+
+        listDTO = new ListDTO<XuankedataEntity>(list, pageNum, size, total);
+
+        //加载到redis中
+        redisService.setToHash("forResultList::" + tno, tno + "-" + pageNum, listDTO, 30, TimeUnit.MINUTES);
+        LOGGER.info("从数据中加载选课结果，并将选课结果写入redis中");
+        return listDTO;
+    }
+
+    @Override
     public ListDTO<XuankedataEntity> getChooseClassListPageByCidAndCno(Integer pageNum, Integer size, String cid,String cno) {
 
         ListDTO<XuankedataEntity> listDTO = (ListDTO<XuankedataEntity>) redisService.getFromHash("forResultList::" + cid + cno, cid + cno + "-" + pageNum);
@@ -92,8 +118,12 @@ public class ResultServiceImpl implements ResultService {
             List<Predicate> predicates = new ArrayList<>();
 
             //根据cid cname查询
-            predicates.add(builder.equal(root.get("cid"), cid));
-            predicates.add(builder.equal(root.get("cno"), cno));
+            if(cid != null) {
+                predicates.add(builder.equal(root.get("cid"), cid));
+            }
+            if(cno != null) {
+                predicates.add(builder.equal(root.get("cno"), cno));
+            }
 
             return builder.and(predicates.toArray(new Predicate[0]));
         }, pageable);
@@ -153,4 +183,5 @@ public class ResultServiceImpl implements ResultService {
         }
         return entity;
     }
+
 }

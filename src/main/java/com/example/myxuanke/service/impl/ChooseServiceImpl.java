@@ -84,8 +84,6 @@ public class ChooseServiceImpl implements ChooseService, InitializingBean {
     @Override
     public ListDTO<ClassdataEntity> getNeedClassListPageByCname(Integer pageNum, Integer size,String cname) {
 
-        ListDTO<ClassdataEntity> listDTO = (ListDTO<ClassdataEntity>)redisService.getFromHash("forClass_Cname", String.valueOf(pageNum));
-        if(listDTO != null) return listDTO;
         Pageable pageable = PageRequest.of(pageNum, size, Sort.by("pno"));
 
         //复杂条件查询,只查询余量不为0的课程
@@ -102,16 +100,12 @@ public class ChooseServiceImpl implements ChooseService, InitializingBean {
         }, pageable);
 
         ListDTO<ClassdataEntity> planDto = new ListDTO<>(page.stream().collect(Collectors.toList()), page.getNumber(), size, page.getTotalPages());
-        //结果变动快，缓存一分钟，减少数据库压力，缺陷是课程余量显示会存在延迟
-        redisService.setToHash("forClass_Cname", String.valueOf(pageNum), planDto, 1, TimeUnit.MINUTES);
         return planDto;
     }
 
     @Override
     public ListDTO<ClassdataEntity> getNeedClassListPageByCid(Integer pageNum, Integer size,String cid) {
 
-        ListDTO<ClassdataEntity> listDTO = (ListDTO<ClassdataEntity>)redisService.getFromHash("forClass_Cid", String.valueOf(pageNum));
-        if(listDTO != null) return listDTO;
 
         Pageable pageable = PageRequest.of(pageNum, size, Sort.by("pno"));
 
@@ -130,16 +124,11 @@ public class ChooseServiceImpl implements ChooseService, InitializingBean {
 
         ListDTO<ClassdataEntity> planDto = new ListDTO<>(page.stream().collect(Collectors.toList()), page.getNumber(), size, page.getTotalPages());
 
-        //结果变动快，缓存一分钟，减少数据库压力，缺陷是课程余量显示会存在延迟
-        redisService.setToHash("forClass_Cid", String.valueOf(pageNum), planDto, 1, TimeUnit.MINUTES);
         return planDto;
     }
 
     @Override
     public ListDTO<ClassdataEntity> getNeedClassListPageByTeaname(Integer pageNum, Integer size,String tname) {
-
-        ListDTO<ClassdataEntity> listDTO = (ListDTO<ClassdataEntity>)redisService.getFromHash("forClass_Tname", String.valueOf(pageNum));
-        if(listDTO != null) return listDTO;
 
         Pageable pageable = PageRequest.of(pageNum, size, Sort.by("pno"));
 
@@ -158,8 +147,6 @@ public class ChooseServiceImpl implements ChooseService, InitializingBean {
 
         ListDTO<ClassdataEntity> planDto = new ListDTO<>(page.stream().collect(Collectors.toList()), page.getNumber(), size, page.getTotalPages());
 
-        //结果变动快，缓存一分钟，减少数据库压力，缺陷是课程余量显示会存在延迟
-        redisService.setToHash("forClass_Tname", String.valueOf(pageNum), planDto, 1, TimeUnit.MINUTES);
         return planDto;
     }
 

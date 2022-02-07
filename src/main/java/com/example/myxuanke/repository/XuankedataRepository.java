@@ -23,4 +23,8 @@ public interface XuankedataRepository extends JpaRepository<XuankedataEntity, In
 
     //pno sno chaxun
     XuankedataEntity findXuankedataEntityByPnoAndSno(Integer pno,String sno);
+
+    //根据tno查询 使用sql
+    @Query("select p from XuankedataEntity p, ClassdataEntity n where n.tno = ?1 and n.cid = p.cid and n.cno = p.cno")
+    List<XuankedataEntity> findXuankedataEntitiesByTno(String tno);
 }

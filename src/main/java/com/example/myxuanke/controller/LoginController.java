@@ -8,6 +8,7 @@ import com.example.myxuanke.service.StudentService;
 import com.example.myxuanke.service.TeacherService;
 import com.example.myxuanke.utils.StudentIDUtils;
 import com.example.myxuanke.utils.TeacherIDUtils;
+import com.example.myxuanke.utils.JudgeSorT;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.LockedAccountException;
@@ -36,13 +37,17 @@ public class LoginController {
     @Autowired
     private TeacherService teacherService;
 
+
     @PostMapping("/do/loginbystu")
     @ResponseBody
     public String doLoginbystu(StudataEntity studentEntity, HttpServletResponse response) {
 
         String sno = studentEntity.getSno();
         String password = studentEntity.getPassword();
-        LOGGER.info("从前端取得的输入密码{}", password);
+        LOGGER.info("学生从前端取得的输入密码{}", password);
+
+        //把登录身份写入判断身份类
+        JudgeSorT.addRoleToMap(sno,1);
 
         //查询学号对应学生的实体类
         StudataEntity student = studentService.findStudentById(sno);
@@ -64,7 +69,8 @@ public class LoginController {
             //得到session过期时间
             long timeout = subject.getSession().getTimeout();
             //将学生姓名添加到cookie中
-            addCookie("stuname", student.getStuname(), timeout, response);
+            addCookie("name", student.getStuname(), timeout, response);
+            addCookie("type", "学生", timeout, response);
             LOGGER.info("do login result ==> " + msg);
 
             return msg;
@@ -86,9 +92,12 @@ public class LoginController {
 
         String tno = teadentEntity.getTno();
         String password = teadentEntity.getPassword();
+        LOGGER.info("老师从前端取得的输入号码{}", tno);
         LOGGER.info("从前端取得的输入密码{}", password);
 
-        //查询学号对应学生的实体类
+        //把登录身份写入判断身份类
+        JudgeSorT.addRoleToMap(tno,2);
+
         TeadataEntity teacher = teacherService.findTeacherById(tno);
 
         // 获取当前的subject
@@ -108,7 +117,8 @@ public class LoginController {
             //得到session过期时间
             long timeout = subject.getSession().getTimeout();
             //将学生姓名添加到cookie中
-            addCookie("teaname", teacher.getTeaname(), timeout, response);
+            addCookie("name", teacher.getTeaname(), timeout, response);
+            addCookie("type", "老师", timeout, response);
             LOGGER.info("do login result ==> " + msg);
 
             return msg;
@@ -128,8 +138,18 @@ public class LoginController {
     public String logout() {
 
         Subject subject = SecurityUtils.getSubject();
+        String id = (String) subject.getSession().getId();
         // 登出
-        StudentIDUtils.removeUserIdFromMap();
+        Integer identity = JudgeSorT.getRoleFromMap(id);
+        LOGGER.info("身份：");
+        LOGGER.info(String.valueOf(identity));
+        if(identity == 1) {
+            StudentIDUtils.removeUserIdFromMap();
+        }
+        if(identity == 2){
+            TeacherIDUtils.removeUserIdFromMap();
+        }
+        JudgeSorT.removeRoleFromMap((String) subject.getSession().getId());
         LOGGER.info("User " + subject.getPrincipal() + " logout.");
         subject.logout();
 

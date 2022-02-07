@@ -9,6 +9,7 @@ import com.example.myxuanke.service.ChooseService;
 import com.example.myxuanke.repository.ClassdataRepository;
 import com.example.myxuanke.utils.StudentIDUtils;
 import com.example.myxuanke.utils.TeacherIDUtils;
+import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +29,9 @@ public class ResultController {
     private ResultService resultService;
 
     @Autowired
-    private ClassdataRepository planRepositroy;
+    private ClassdataRepository planRepository;
 
+    @RequiresRoles("student")
     @GetMapping("/listbysno")
     public String chooseResultListBySno(Model model, @RequestParam(value = "pageNum", defaultValue = "0")Integer pageNum,
                                    @RequestParam(value = "size", defaultValue = "6") Integer size) {
@@ -43,6 +45,8 @@ public class ResultController {
         return "resultbystu";
 
     }
+
+    @RequiresRoles("teacher")
     @GetMapping("/listbytno")
     public String chooseResultListByTno(Model model, @RequestParam(value = "pageNum", defaultValue = "0")Integer pageNum,
                                    @RequestParam(value = "size", defaultValue = "6") Integer size) {
@@ -50,14 +54,14 @@ public class ResultController {
         //在这要根据学号查询选课结果，不然直接查表会拿到其他学生的选课结果
         String  tno = TeacherIDUtils.getStudentIDFromMap();
         LOGGER.info("取得老师学号 {}", tno);
-        List<ClassdataEntity> list = planRepositroy.findClassdataEntitiesByTno(String.valueOf(tno));
-        ListDTO<XuankedataEntity> page = new ListDTO<>();
-        for(ClassdataEntity classn:list){
-            ListDTO<XuankedataEntity> newpage = resultService.getChooseClassListPageByCidAndCno(pageNum,size,classn.getCid(),classn.getCno());
-            page.add(newpage);
-        }
+        ListDTO<XuankedataEntity> page = resultService.getChooseClassListPageByTno(pageNum,size,tno);
+        //List<ClassdataEntity> list = planRepository.findClassdataEntitiesByTno(String.valueOf(tno));
+        //ListDTO<XuankedataEntity> page = new ListDTO<XuankedataEntity>();
+        //for(ClassdataEntity classn:list){
+        //    ListDTO<XuankedataEntity> newpage = resultService.getChooseClassListPageByCidAndCno(pageNum,size,classn.getCid(),classn.getCno());
+        //    page.add(newpage);
+        //}
         model.addAttribute("Result", page);
-
         return "resultbytea";
 
     }

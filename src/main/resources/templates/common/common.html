@@ -86,13 +86,13 @@
                     <ul class="topbar-right">
                         <li class="dropdown dropdown-profile">
                             <a href="javascript:void(0)" data-toggle="dropdown">
-                                <!--                                改成从cookie中获取学生姓名-->
+                                <!--                                改成从cookie中获取姓名-->
                                 <span th:id="sno" th:each="cookie :${#httpServletRequest.getCookies()}"
-                                      th:if="${cookie.getName().equals('stuname')}" th:text="'欢迎您：'+${cookie.getValue()+'同学'}"
+                                      th:if="${cookie.getName().equals('name')}" th:text="'欢迎您：'+${cookie.getValue()}"
                                       >
                                 <span></span> <span class="caret"></span></span>
                                 <span th:id="sno" th:each="cookie :${#httpServletRequest.getCookies()}"
-                                      th:if="${cookie.getName().equals('teaname')}" th:text="'欢迎您：'+${cookie.getValue()+'老师'}"
+                                      th:if="${cookie.getName().equals('type')}" th:text="${cookie.getValue()}"
                                 >
                                 <span></span> <span class="caret"></span></span>
                             </a>

@@ -25,7 +25,6 @@ public class StudentServiceImpl implements StudentService {
     private RedisService redisService;
 
     @Override
-    //@Cacheable(cacheNames = "forStudent", key = "#sno", cacheManager = "publicInfo")    //todo 为啥缓存未生效
     public StudataEntity findStudentById(String sno) {
 
         StudataEntity studentEntity = (StudataEntity) redisService.get("forStudent::", String.valueOf(sno));

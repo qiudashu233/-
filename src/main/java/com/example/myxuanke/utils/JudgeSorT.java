@@ -18,7 +18,9 @@ public class JudgeSorT {
     public static void addRoleToMap(String number,Integer p) {
 
         //1代表学生 2代表老师
-        map.put(number, p);
+        Subject subject = SecurityUtils.getSubject();
+        String id = (String) subject.getSession().getId();
+        map.put(id, p);
     }
 
     public static Integer getRoleFromMap(String number) {

@@ -11,7 +11,7 @@
 <div class="lyear-layout-web">
     <div class="lyear-layout-container">
         <!--左侧导航-->
-        <div th:replace="~{common/common::sidebar(first='info',second='result')}"></div>
+        <div th:replace="~{common/common::sidebar(first='info',second='listbytno')}"></div>
         <!--End 左侧导航-->
 
         <!--头部信息-->
@@ -28,11 +28,6 @@
                         <div class="card">
                             <div class="card-header">
                                 <h3>选课情况查询</h3>
-                                <div class="pull-right">
-                                    <button class="btn btn-label btn-w-lg btn-primary" id="noChoose">
-                                        <label><i class="mdi mdi-checkbox-marked-circle-outline"></i></label> 确认退课
-                                    </button>
-                                </div>
                             </div>
 
                             <div class="card-body">
@@ -65,12 +60,12 @@
 
                                 <div>
                                     <ul class="pagination pull-right">
-                                        <li><a th:href="@{'/result/listbysno?pageNum=0'}">首页</a></li>
+                                        <li><a th:href="@{'/result/listbytea?pageNum=0'}">首页</a></li>
                                         <li>
-                                            <a th:if="${Result.number!=0}" th:href="@{'/result/listbysno?pageNum=' + ${Result.number - 1}}" >上一页</a>
+                                            <a th:if="${Result.number!=0}" th:href="@{'/result/listbytea?pageNum=' + ${Result.number - 1}}" >上一页</a>
                                         </li>
                                         <li>
-                                            <a th:if="${Result.number==0}" th:href="@{'/result/listbysno?pageNum=0'}" >上一页</a>
+                                            <a th:if="${Result.number==0}" th:href="@{'/result/listbytea?pageNum=0'}" >上一页</a>
                                         </li>
 
                                         <!--<li th:each="pageNum:${#numbers.sequence(0, Plan.getTotalPages() - 1)}">
@@ -80,12 +75,12 @@
                                         <li><a class="btn btn-default btn-lg active" href="#" >1</a></li>-->
 
                                         <li>
-                                            <a th:if="${Result.number != (Result.totalPages - 1)}" th:href="@{'/result/listbysno?pageNum=' + ${Result.number + 1}}" >下一页</a>
+                                            <a th:if="${Result.number != (Result.totalPages - 1)}" th:href="@{'/result/listbytea?pageNum=' + ${Result.number + 1}}" >下一页</a>
                                         </li>
                                         <li>
-                                            <a th:if="${Result.number == (Result.totalPages - 1)}" th:href="@{'/result/listbysno?pageNum=' + ${Result.totalPages - 1}}" >下一页</a>
+                                            <a th:if="${Result.number == (Result.totalPages - 1)}" th:href="@{'/result/listbytea?pageNum=' + ${Result.totalPages - 1}}" >下一页</a>
                                         </li>
-                                        <li><a th:href="@{'/result/listbysno?pageNum='+ ${Result.totalPages==0? 0:Result.totalPages - 1} }" >尾页</a></li>
+                                        <li><a th:href="@{'/result/listbytea?pageNum='+ ${Result.totalPages==0? 0:Result.totalPages - 1} }" >尾页</a></li>
                                     </ul>
                                 </div>
                             </div>
